@@ -20,13 +20,13 @@ module Von
         hget("#{hash_key}:#{time_unit}", 'timestamp')
       end
 
-      def increment(by=1)
+      def increment(by=1, at=Time.now)
         return if @periods.empty?
 
         @periods.each do |period|
-          if period.timestamp != current_timestamp(period.time_unit)
+          if period.timestamp(at) != current_timestamp(period.time_unit)
             hset("#{hash_key}:#{period.time_unit}", 'total', by)
-            hset("#{hash_key}:#{period.time_unit}", 'timestamp', period.timestamp)
+            hset("#{hash_key}:#{period.time_unit}", 'timestamp', period.timestamp(at))
           else
             hincrby("#{hash_key}:#{period.time_unit}", 'total', by)
           end

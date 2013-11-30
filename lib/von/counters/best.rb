@@ -28,17 +28,17 @@ module Von
         hget("#{hash_key}:#{time_unit}:current", 'timestamp')
       end
 
-      def increment(by=1)
+      def increment(by=1, at=Time.now)
         return if @periods.empty?
 
         @periods.each do |period|
           _current_timestamp = current_timestamp(period.time_unit)
           _current_total     = current_total(period.time_unit)
 
-          if period.timestamp != _current_timestamp
+          if period.timestamp(at) != _current_timestamp
             # changing current period
             hset("#{hash_key}:#{period.time_unit}:current", 'total', by)
-            hset("#{hash_key}:#{period.time_unit}:current", 'timestamp', period.timestamp)
+            hset("#{hash_key}:#{period.time_unit}:current", 'timestamp', period.timestamp(at))
 
             if best_total(period) < _current_total
               hset("#{hash_key}:#{period.time_unit}:best", 'total', _current_total)
